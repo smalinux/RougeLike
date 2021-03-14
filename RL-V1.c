@@ -1,4 +1,7 @@
-// TODO : Clean el code , el spaces, al tabs, naming, commenting, 
+/*
+ * My RougeLike Version 1
+ */
+// TODO : Clean el code , el spaces, al tabs, naming, commenting,
 // TODO : Separate code to files at the end of project
 // TODO : comment & describe every function
 #include "stdlib.h"
@@ -231,7 +234,7 @@ Player * PlayerSetUp() {
 Position * handleInput(int input, Player * user) {
 	Position * newPosition;
 	newPosition = malloc(sizeof(Position));
-	
+
 	if (input == 'w' || input == 'W')	// Move Up
 	{
 		newPosition->y 	= user->position->y - 1;
@@ -258,13 +261,13 @@ Position * handleInput(int input, Player * user) {
 int CheckPosition(Position * newPosition, Level * level) {
 	Player * user;
 	user = level->user;
-	if ( mvinch(newPosition->y, newPosition->x) == '.' 	|| 
-		mvinch(newPosition->y, newPosition->x) == '+' 	|| 
+	if ( mvinch(newPosition->y, newPosition->x) == '.' 	||
+		mvinch(newPosition->y, newPosition->x) == '+' 	||
 		mvinch(newPosition->y, newPosition->x) == '#' )
 	{
 		playerMove(newPosition, user, level->tiles);
-	} else if (mvinch(newPosition->y, newPosition->x) == 'X' 	|| 
-		mvinch(newPosition->y, newPosition->x) == 'G' 	|| 
+	} else if (mvinch(newPosition->y, newPosition->x) == 'X' 	||
+		mvinch(newPosition->y, newPosition->x) == 'G' 	||
 		mvinch(newPosition->y, newPosition->x) == 'T' ) {
 		combat(user, getMonsterAt(newPosition, level->monsters), 1);
 	} else {
@@ -321,35 +324,35 @@ int connectDoors(Position * doorOne, Position * doorTwo) {
 
 	temp.x 		= doorOne->x;
 	temp.y 		= doorOne->y;
-	
+
 	int count 	= 0;
 
 	prev 		= temp;
 
 	while(1) {
 		// Move Left
-		if (abs( (temp.x -1) - doorTwo->x) < abs( ( temp.x) - doorTwo->x) && 
+		if (abs( (temp.x -1) - doorTwo->x) < abs( ( temp.x) - doorTwo->x) &&
 			mvinch(temp.y, temp.x -1) == ' ')
 		{
 			prev.x 	= temp.x;
 			temp.x 	= temp.x -1;
 		}
 		// Move Right
-		else if (abs( temp.x +1 - doorTwo->x) < abs( ( temp.x) - doorTwo->x) && 
+		else if (abs( temp.x +1 - doorTwo->x) < abs( ( temp.x) - doorTwo->x) &&
 			mvinch(temp.y, temp.x +1) == ' ')
 		{
 			prev.x 	= temp.x;
 			temp.x 	= temp.x +1;
 		}
 		// Move down
-		else if (abs( (temp.y +1) - doorTwo->y) < abs( ( temp.y) - doorTwo->y) && 
+		else if (abs( (temp.y +1) - doorTwo->y) < abs( ( temp.y) - doorTwo->y) &&
 			mvinch(temp.y +1, temp.x) == ' ')
 		{
 			prev.x 	= temp.x;
 			temp.y 	= temp.y +1;
 		}
 		// Move up
-		else if (abs( (temp.y +1) - doorTwo->y) < abs( ( temp.y) - doorTwo->y) && 
+		else if (abs( (temp.y +1) - doorTwo->y) < abs( ( temp.y) - doorTwo->y) &&
 			mvinch(temp.y -1, temp.x) == ' ')
 		{
 			prev.x 	= temp.x;
@@ -410,7 +413,7 @@ char ** saveLevelPositions() {
 	Attacks: 3
 	defence: 1
 	pathfinding: 2 (2 == Move closer to the player) ("Seeking")
-	
+
 3 Troll
 	Symbol: T
 	levels: 4 to 6
@@ -499,7 +502,7 @@ int killMonster(Monster * monster) {
 
 int setStartingPosition(Monster * monster, Room * room) {
 	monster->position 		= malloc(sizeof(Position));
-	
+
 	monster->position->y 	= (rand() % (room->height -2)) + room->position.y +1;
 	monster->position->x 	= (rand() % (room->width -2)) + room->position.x +1;
 
@@ -584,25 +587,25 @@ Seek pathfinding
 */
 int pathfindingSeek(Position * start, Position * destination) {
 	// Move Left
-	if (abs( (start->x -1) - destination->x) < abs( ( start->x) - destination->x) && 
+	if (abs( (start->x -1) - destination->x) < abs( ( start->x) - destination->x) &&
 		mvinch(start->y, start->x -1) == '.')
 	{
 		start->x 	= start->x -1;
 	}
 	// Move Right
-	else if (abs( start->x +1 - destination->x) < abs( ( start->x) - destination->x) && 
+	else if (abs( start->x +1 - destination->x) < abs( ( start->x) - destination->x) &&
 		mvinch(start->y, start->x +1) == '.')
 	{
 		start->x 	= start->x +1;
 	}
 	// Move down
-	else if (abs( (start->y +1) - destination->y) < abs( ( start->y) - destination->y) && 
+	else if (abs( (start->y +1) - destination->y) < abs( ( start->y) - destination->y) &&
 		mvinch(start->y +1, start->x) == '.')
 	{
 		start->y 	= start->y +1;
 	}
 	// Move up
-	else if (abs( (start->y +1) - destination->y) < abs( ( start->y) - destination->y) && 
+	else if (abs( (start->y +1) - destination->y) < abs( ( start->y) - destination->y) &&
 		mvinch(start->y -1, start->x) == '.')
 	{
 		start->y 	= start->y +1;
