@@ -1,5 +1,6 @@
 // FIXME all function returns int should return something int!
 // FIXME clean all alloc spaces
+// FIXME make a wrapper to ncurses and reverse y <-> x postions
 /*
  * My RougeLike version 2
  *
@@ -20,6 +21,7 @@ int mapSetUp(); //
 Player* playerSetUp();
 int handleInput(int input, Player* user);
 int playerMove(int y, int x, Player* user);
+int checkPostion(int newY, int newX, Player* unit);
 
 int main()
 {
@@ -88,29 +90,35 @@ Player* playerSetUp()
 
 int handleInput(int input, Player* user)
 {
+   int newY;
+   int newX;
    switch (input) {
       /* move up */
    case 'k':
    case 'K':
-      playerMove(user->yPosition - 1, user->xPosition, user);
+      newY  = user->yPosition -1;
+      newX  = user->xPosition;
       break;
 
       /* move down */
    case 'j':
    case 'J':
-      playerMove(user->yPosition + 1, user->xPosition, user);
+      newY  = user->yPosition +1;
+      newX  = user->xPosition;
       break;
 
       /* move left */
    case 'h':
    case 'H':
-      playerMove(user->yPosition, user->xPosition - 1, user);
+      newY  = user->yPosition;
+      newX  = user->xPosition -1;
       break;
 
       /* move right */
    case 'l':
    case 'L':
-      playerMove(user->yPosition, user->xPosition + 1, user);
+      newY  = user->yPosition;
+      newX  = user->xPosition +1;
       break;
 
    default:
@@ -118,6 +126,22 @@ int handleInput(int input, Player* user)
 
    }
 
+   checkPostion(newY, newX, user);
+
+}
+
+int checkPostion(int newY, int newX, Player* unit)
+{
+   int space;
+   switch(mvinch(newY, newX))
+   {
+      case '.':
+         playerMove(newY, newX, unit);
+         break;
+      default:
+         move(unit->yPosition, unit->xPosition);
+         break;
+   }
 }
 
 int playerMove(int y, int x, Player* user)
