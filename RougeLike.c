@@ -1,5 +1,10 @@
+// FIXME all function returns int should return something int!
+// FIXME clean all alloc spaces
 /*
  * My RougeLike version 2
+ *
+ * hjkl  for move around because now I use vim!
+ *    and I think this more logical to me! and more cute!
  */
 #include <ncurses.h>
 #include <stdlib.h>
