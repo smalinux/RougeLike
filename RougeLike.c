@@ -10,18 +10,34 @@
 #include <ncurses.h>
 #include <stdlib.h>
 
+typedef struct Position_ {
+   int x;
+   int y;
+} Position;
+
+typedef struct Room_ {
+   Position position;
+   int height;
+   int width;
+   //monster** monster;
+   //Item** items;
+} Room;
+
 typedef struct Player_ {
-   int xPosition;
-   int yPosition;
+   Position position;
    int health;
 } Player;
 
 int screenSetUp(); // ncurses setup
-int mapSetUp(); //
+Room** mapSetUp(); //
 Player* playerSetUp();
 int handleInput(int input, Player* user);
 int playerMove(int y, int x, Player* user);
 int checkPostion(int newY, int newX, Player* unit);
+
+/* room functions */
+Room* createRoom(int x, int y, int height, int width);
+int drawRoom(Room* room);
 
 int main()
 {
@@ -54,36 +70,27 @@ int screenSetUp()
    return 0;
 }
 
-int mapSetUp()
+Room** mapSetUp()
 {
-   mvprintw(13, 13, "------------");
-   mvprintw(14, 13, "|..........|");
-   mvprintw(15, 13, "|..........|");
-   mvprintw(16, 13, "|..........|");
-   mvprintw(17, 13, "|..........|");
-   mvprintw(18, 13, "------------");
+   Room** rooms = malloc(sizeof(Room)*6);
 
-
-   mvprintw(13, 40, "------------");
-   mvprintw(14, 40, "|..........|");
-   mvprintw(15, 40, "|..........|");
-   mvprintw(16, 40, "|..........|");
-   mvprintw(17, 40, "|..........|");
-   mvprintw(18, 40, "------------");
-
-
-   return 1; // 1 == Succes
+   rooms[0] = createRoom(13, 13, 6, 8);
+   drawRoom(rooms[0]);
+   rooms[1] = createRoom(30, 13, 10, 20);
+   drawRoom(rooms[1]);
+   rooms[2] = createRoom(13, 25, 10, 15);
+   drawRoom(rooms[2]);
 }
 
 Player* playerSetUp()
 {
    Player* newPlayer;
    newPlayer = malloc(sizeof(Player));
-   newPlayer->xPosition = 14;
-   newPlayer->yPosition = 14;
+   newPlayer->position.x = 14;
+   newPlayer->position.y = 14;
    newPlayer->health = 14;
 
-   playerMove(newPlayer->yPosition, newPlayer->xPosition, newPlayer);
+   playerMove(newPlayer->position.y, newPlayer->position.x, newPlayer);
 
    return newPlayer;
 }
@@ -96,29 +103,29 @@ int handleInput(int input, Player* user)
       /* move up */
    case 'k':
    case 'K':
-      newY  = user->yPosition -1;
-      newX  = user->xPosition;
+      newY  = user->position.y -1;
+      newX  = user->position.x;
       break;
 
       /* move down */
    case 'j':
    case 'J':
-      newY  = user->yPosition +1;
-      newX  = user->xPosition;
+      newY  = user->position.y +1;
+      newX  = user->position.x;
       break;
 
       /* move left */
    case 'h':
    case 'H':
-      newY  = user->yPosition;
-      newX  = user->xPosition -1;
+      newY  = user->position.y;
+      newX  = user->position.x -1;
       break;
 
       /* move right */
    case 'l':
    case 'L':
-      newY  = user->yPosition;
-      newX  = user->xPosition +1;
+      newY  = user->position.y;
+      newX  = user->position.x +1;
       break;
 
    default:
@@ -139,20 +146,70 @@ int checkPostion(int newY, int newX, Player* unit)
          playerMove(newY, newX, unit);
          break;
       default:
-         move(unit->yPosition, unit->xPosition);
+         move(unit->position.y, unit->position.x);
          break;
    }
 }
 
 int playerMove(int y, int x, Player* user)
 {
-   mvprintw(user->yPosition, user->xPosition, ".");
+   mvprintw(user->position.y, user->position.x, ".");
 
-   user->yPosition   = y;
-   user->xPosition   = x;
+   user->position.y   = y;
+   user->position.x   = x;
 
-   mvprintw(user->yPosition, user->xPosition, "@");
-   move(user->yPosition, user->xPosition);
+   mvprintw(user->position.y, user->position.x, "@");
+   move(user->position.y, user->position.x);
 
+
+}
+
+// room info
+Room* createRoom(int x, int y, int height, int width)
+{
+   Room* newRoom;
+   newRoom = malloc(sizeof(Room));
+
+   newRoom->position.x   = x;
+   newRoom->position.y   = y;
+   newRoom->height      = height;
+   newRoom->width       = width;
+
+   return newRoom;
+}
+
+
+/*
+   ------------
+   |..........|
+   |..........|
+   |..........|
+   |..........|
+   ------------
+*/
+int drawRoom(Room* room)
+{
+   int x;
+   int y;
+
+   /* draw top and bottom */
+   for(x = room->position.x; x < room->position.x+ room->width; ++x)
+   {
+      mvprintw(room->position.y, x, "-"); /* top */
+      mvprintw(room->position.y + room->height -1, x, "-"); /* bottom */
+   }
+
+   /* draw floors and side walls */
+   for(y = room->position.y +1; y < room->position.y + room->height -1; ++y)
+   {
+      /* draw side walls */
+      mvprintw(y, room->position.x, "|");
+      mvprintw(y, room->position.x + room->width -1, "|");
+      /* draw floors */
+      for(x = room->position.x +1; x < room->position.x + room->width -1; ++x)
+      {
+         mvprintw(y, x, ".");
+      }
+   }
 
 }
