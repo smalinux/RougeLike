@@ -36,6 +36,7 @@ Player* playerSetUp();
 int handleInput(int input, Player* user);
 int playerMove(int y, int x, Player* user);
 int checkPostion(int newY, int newX, Player* unit);
+int connectDoors(Position* doorOne, Position* doorTwo);
 
 /* room functions */
 Room* createRoom(int x, int y, int height, int width);
@@ -83,6 +84,8 @@ Room** mapSetUp()
    drawRoom(rooms[1]);
    rooms[2] = createRoom(13, 25, 10, 15);
    drawRoom(rooms[2]);
+
+   connectDoors(&rooms[0]->doors[2], &rooms[2]->doors[0]);
 }
 
 Player* playerSetUp()
@@ -146,6 +149,8 @@ int checkPostion(int newY, int newX, Player* unit)
    switch(mvinch(newY, newX))
    {
       case '.':
+      case '+':
+      case '#':
          playerMove(newY, newX, unit);
          break;
       default:
@@ -183,13 +188,13 @@ Room* createRoom(int x, int y, int height, int width)
    newRoom->doors[0].x  = rand() % (width -2) + newRoom->position.x +1;
    newRoom->doors[0].y  = newRoom->position.y;
 
-   /* bottom door */
-   newRoom->doors[1].x  = rand() % (width -2) + newRoom->position.x +1;
-   newRoom->doors[1].y  = newRoom->position.y + newRoom->height -1;
-
    /* left door */
-   newRoom->doors[2].y  = rand() % (height -2) + newRoom->position.y +1;
-   newRoom->doors[2].x  = newRoom->position.x;
+   newRoom->doors[1].y  = rand() % (height -2) + newRoom->position.y +1;
+   newRoom->doors[1].x  = newRoom->position.x;
+
+   /* bottom door */
+   newRoom->doors[2].x  = rand() % (width -2) + newRoom->position.x +1;
+   newRoom->doors[2].y  = newRoom->position.y + newRoom->height -1;
 
    /* right door */
    newRoom->doors[3].y  = rand() % (height -2) + newRoom->position.y +1;
@@ -238,4 +243,52 @@ int drawRoom(Room* room)
    mvprintw(room->doors[2].y, room->doors[2].x, "+");
    mvprintw(room->doors[3].y, room->doors[3].x, "+");
 
+}
+
+int connectDoors(Position* doorOne, Position* doorTwo)
+{
+   Position temp;
+
+   temp.x   = doorOne->x;
+   temp.y   = doorOne->y;
+
+   while(1)
+   {
+      /* step left */
+      if( (abs((temp.x - 1) - doorTwo->x) < abs(temp.x - doorTwo->x)) && (mvinch(temp.y, temp.x -1) == ' ') )
+      {
+         mvprintw(temp.y, temp.x -1, "#");
+         temp.x = temp.x -1;
+      }
+
+      /* step right */
+      else if( (abs((temp.x + 1) - doorTwo->x) < abs(temp.x - doorTwo->x)) && (mvinch(temp.y, temp.x +1) == ' ') )
+      {
+         mvprintw(temp.y, temp.x +1, "#");
+         temp.x = temp.x +1;
+      }
+
+      /* step down */
+      else if( (abs((temp.y + 1) - doorTwo->y) < abs(temp.y - doorTwo->y)) && (mvinch(temp.y +1, temp.y) == ' ') )
+      {
+         mvprintw(temp.y +1, temp.x, "#");
+         temp.y = temp.y +1;
+      }
+
+      /* step up */
+      else if( (abs((temp.y - 1) - doorTwo->y) < abs(temp.y - doorTwo->y)) && (mvinch(temp.y -1, temp.y) == ' ') )
+      {
+         mvprintw(temp.y -1, temp.x, "#");
+         temp.y = temp.y -1;
+      }
+
+      else {
+         return 0;      // failure
+      }
+
+      getch();
+
+   }
+
+   return 1;
 }
