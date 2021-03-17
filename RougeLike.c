@@ -82,10 +82,11 @@ Room** mapSetUp()
    drawRoom(rooms[0]);
    rooms[1] = createRoom(30, 13, 10, 20);
    drawRoom(rooms[1]);
-   rooms[2] = createRoom(13, 25, 10, 15);
+   rooms[2] = createRoom(13, 25, 10, 10);
    drawRoom(rooms[2]);
 
    connectDoors(&rooms[0]->doors[2], &rooms[2]->doors[0]);
+   connectDoors(&rooms[1]->doors[2], &rooms[2]->doors[3]);
 }
 
 Player* playerSetUp()
@@ -248,47 +249,57 @@ int drawRoom(Room* room)
 int connectDoors(Position* doorOne, Position* doorTwo)
 {
    Position temp;
+   Position prev;
+   int count = 0;
 
    temp.x   = doorOne->x;
    temp.y   = doorOne->y;
+
+   prev     = temp;
 
    while(1)
    {
       /* step left */
       if( (abs((temp.x - 1) - doorTwo->x) < abs(temp.x - doorTwo->x)) && (mvinch(temp.y, temp.x -1) == ' ') )
       {
-         mvprintw(temp.y, temp.x -1, "#");
+         prev.x   = temp.x;
          temp.x = temp.x -1;
       }
 
       /* step right */
       else if( (abs((temp.x + 1) - doorTwo->x) < abs(temp.x - doorTwo->x)) && (mvinch(temp.y, temp.x +1) == ' ') )
       {
-         mvprintw(temp.y, temp.x +1, "#");
+         prev.x   = temp.x;
          temp.x = temp.x +1;
       }
 
       /* step down */
       else if( (abs((temp.y + 1) - doorTwo->y) < abs(temp.y - doorTwo->y)) && (mvinch(temp.y +1, temp.y) == ' ') )
       {
-         mvprintw(temp.y +1, temp.x, "#");
+         prev.y   = temp.y;
          temp.y = temp.y +1;
       }
 
       /* step up */
       else if( (abs((temp.y - 1) - doorTwo->y) < abs(temp.y - doorTwo->y)) && (mvinch(temp.y -1, temp.y) == ' ') )
       {
-         mvprintw(temp.y -1, temp.x, "#");
+         prev.y   = temp.y;
          temp.y = temp.y -1;
       }
 
       else {
-         return 0;      // failure
+         if(count == 0) {
+            temp  = prev;
+            ++count;
+            continue;
+         } else {
+            return 0;
+         }
       }
 
-      getch();
+      mvprintw(temp.y, temp.x, "#");
 
    }
 
-   return 1;
+   return 1; // Success
 }
