@@ -69,6 +69,7 @@ int screenSetUp()
 {
    initscr();
    noecho();
+   start_color();
    refresh();
 
    return 0;
@@ -77,6 +78,8 @@ int screenSetUp()
 Room** mapSetUp()
 {
    Room** rooms = malloc(sizeof(Room)*6);
+   init_pair(1, COLOR_RED, COLOR_BLACK);
+   init_pair(2, COLOR_WHITE, COLOR_BLACK);
 
    rooms[0] = createRoom(13, 13, 6, 8);
    drawRoom(rooms[0]);
@@ -146,12 +149,11 @@ int handleInput(int input, Player* user)
 
 int checkPostion(int newY, int newX, Player* unit)
 {
-   int space;
-   switch(mvinch(newY, newX))
+   // Check with color of floor,
+   // white == allow to move over
+   switch(mvinch(newY, newX) & A_COLOR)
    {
-      case '.':
-      case '+':
-      case '#':
+      case COLOR_PAIR(2):
          playerMove(newY, newX, unit);
          break;
       default:
@@ -221,6 +223,7 @@ int drawRoom(Room* room)
    /* draw top and bottom */
    for(x = room->position.x; x < room->position.x+ room->width; ++x)
    {
+      attron(COLOR_PAIR(1));
       mvprintw(room->position.y, x, "-"); /* top */
       mvprintw(room->position.y + room->height -1, x, "-"); /* bottom */
    }
@@ -229,8 +232,10 @@ int drawRoom(Room* room)
    for(y = room->position.y +1; y < room->position.y + room->height -1; ++y)
    {
       /* draw side walls */
+      attron(COLOR_PAIR(1));
       mvprintw(y, room->position.x, "|");
       mvprintw(y, room->position.x + room->width -1, "|");
+      attron(COLOR_PAIR(2));
       /* draw floors */
       for(x = room->position.x +1; x < room->position.x + room->width -1; ++x)
       {
